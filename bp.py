@@ -14,7 +14,7 @@ __license__ = 'MIT'
 __origin_date__ = '2021-11-25'
 __prog__ = 'bp.py'
 __purpose__ = 'colorization module "Better Print" (bp)'
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 __version_date__ = '2021-11-29'
 __version_info__ = tuple(int(i) for i in __version__.split('.') if i.isdigit())
 ver = f'{__prog__} v{__version__} ({__version_date__})'
@@ -115,7 +115,8 @@ def validate_args():
         bp([f'Starting validate_args()->file_check({f_to_c}).',
             Ct.BMAGENTA], fil=0, veb=3)
         if os.path.isfile(f_to_c):
-            check_append = input(f'({f_to_c}) exists. Append? [Y/N]: ')
+            check_append = input(f'{Ct.YELLOW}({f_to_c}) exists. Append? '
+                                 f'[Y/N]: {Ct.A}')
             # abort on no
             if check_append[:1].lower() == 'n':
                 bp(['Exiting', Ct.YELLOW], fil=0, erl=1)
@@ -125,7 +126,7 @@ def validate_args():
                 bp([f'{check_append} is not "Y" or "N".', Ct.YELLOW], erl=1,
                    fil=0)
                 file_check(f_to_c)
-    bp(['Checking log_file exists and ask if it should be appended.',
+    bp(['Checking if log_file exists and ask if it should be appended.',
         Ct.BMAGENTA], fil=0, veb=2)
     if args.log_file:
         file_check(args.log_file)
@@ -179,15 +180,20 @@ def bp(txt: list, erl=0, fil=1, fls=0, inl=0, log=1, num=1, veb=0):
     Return:
         - None
     """
-    # ~~~ #     this keeps track of the number of non-inline print statements
+    # ~~~ #     variables section
+    # this keeps track of the number of non-inline print statements
     global print_tracker
+    # local variables - txt_tmp gets colored, file_tmp does not
+    txt_out, file_out = '', ''
+    # this provides an empty dict of args in case no args
+    args_dict = vars(args) if 'args' in globals() else {}
 
     # ~~~ #     validate verbosity
-    if args.verbose < veb and erl == 0:
-        return      # don't print anything with higher verbosity than allowed
-
-    # ~~~ #     local variables - txt_tmp gets colored, file_tmp does not
-    txt_out, file_out = '', ''
+    # if verbose not implemented, print everything
+    if 'verbose' in args_dict:
+        # if error logging set, veb ignored and will be printed
+        if args.verbose < veb and erl == 0:
+            return      # skip anything with higher verbosity than requested
 
     # ~~~ #     validate txt list - verify it is in pairs
     txt_l = len(txt)
@@ -236,14 +242,18 @@ def bp(txt: list, erl=0, fil=1, fls=0, inl=0, log=1, num=1, veb=0):
             file_out += val[:]
 
     # ~~~ #     log section - prepend time to each output
-    if args.log and log == 1:
-        dt_now = datetime.now().strftime('[%H:%M:%S]')
-        txt_out = f'{dt_now}-{print_tracker}-{txt_out}'
-        file_out = f'{dt_now}-{print_tracker}-{file_out}'
+    # skip if log is not implemented in args
+    if 'log' in args_dict:
+        if args.log and log == 1:
+            dt_now = datetime.now().strftime('[%H:%M:%S]')
+            txt_out = f'{dt_now}-{print_tracker}-{txt_out}'
+            file_out = f'{dt_now}-{print_tracker}-{file_out}'
 
     # ~~~ #     no color check
-    if args.no_color:
-        txt_out = file_out[:]
+    # skip if no_color not implemented in args
+    if 'no_color' in args_dict:
+        if args.no_color:
+            txt_out = file_out[:]
 
     # ~~~ #     console output section
     if inl == 0:    # default with new line appended
@@ -256,16 +266,18 @@ def bp(txt: list, erl=0, fil=1, fls=0, inl=0, log=1, num=1, veb=0):
         sys.stdout.flush()
 
     # ~~~ #     file output section
-    try:
-        if args.log_file and fil == 1:
-            with open(args.log_file, 'a') as f:
-                f.write(file_out + '\n')
-        if args.error_log_file and erl > 0 and fil == 1:
-            with open(args.error_log_file, 'a') as f:
-                f.write(file_out + '\n')
-    except OSError as e:
-        bp([f'exception caught trying to write to {args.log_file} or '
-            f'{args.error_log_file}\n\t{e}', Ct.RED], erl=1, fil=0)
+    # skip if file log output not implemented in args
+    if 'log_file' in args_dict or 'error_log_file' in args_dict:
+        try:
+            if args.log_file and fil == 1:
+                with open(args.log_file, 'a') as f:
+                    f.write(file_out + '\n')
+            if args.error_log_file and erl > 0 and fil == 1:
+                with open(args.error_log_file, 'a') as f:
+                    f.write(file_out + '\n')
+        except OSError as e:
+            bp([f'exception caught trying to write to {args.log_file} or '
+                f'{args.error_log_file}\n\t{e}', Ct.RED], erl=1, fil=0)
 
     return
 
@@ -320,9 +332,10 @@ def example_progress_bar(symbol='━', empty='─', symbol_color=Ct.A,
         - bracket_color (str, optional): 'bracket' color. Defaults to Ct.A.
         - prog_width (int, optional): progress bar width. Defaults to 50.
     """
+    bp(['Entering example_progress_bar', Ct.BMAGENTA], veb=3)
     bp([f'Creating example_progress_bar using: {symbol} | {empty} | '
         f'{symbol_color} | {empty_color} | {bracket_color} | {prog_width}',
-        Ct.BMAGENTA], veb=3)
+        Ct.BMAGENTA], veb=1)
     bp(['[', bracket_color, f'{empty * prog_width}', empty_color, ']',
         bracket_color], inl=1, fls=1, log=0, fil=0)
     bp(["\b" * (prog_width + 1), Ct.A], inl=1, log=0, fil=0)
@@ -330,7 +343,7 @@ def example_progress_bar(symbol='━', empty='─', symbol_color=Ct.A,
         time.sleep(0.05)
         bp([symbol, symbol_color], inl=1, fls=1, log=0, fil=0)
     bp(['', Ct.A], inl=0, log=0, fil=0)
-    bp(['Finished with example_progress_bar.', Ct.BMAGENTA], veb=3)
+    bp(['Finished with example_progress_bar.', Ct.BMAGENTA], veb=2)
 
     return
 
@@ -351,7 +364,7 @@ def example_percent_complete(loops=50, loop_color=Ct.BLACK, txt='Progress...'):
         bp([f'\u001b[1000D{(for_loop / loops) * 100:.0f}% | {txt}',
             loop_color], inl=1, fls=1, log=0, num=0, fil=0)
     bp(['', Ct.A], log=0, fil=0)
-    bp(['Finished with example_percent_complete.', Ct.BMAGENTA], veb=3)
+    bp(['Finished with example_percent_complete.', Ct.BMAGENTA], veb=2)
 
     return
 
@@ -360,62 +373,93 @@ def example_percent_complete(loops=50, loop_color=Ct.BLACK, txt='Progress...'):
 def examples():
     """Call various examples using bp to show capabilities and ways to make it
     work for you."""
-    bp(['This text shows list position 0 with default color and settings,',
-        Ct.A, ' and this text shows list position 2 w/ position 3 of Red',
+    bp(['Entering examples().', Ct.BMAGENTA], veb=3)
+    bp(['This text shows list position 0 with position 1 of default color,',
+        Ct.A, ' and this text shows list position 2 with position 3 of Red.'
+        ' This uses default settings.',
         Ct.RED])
-    bp(['Calling example_progress_bar() next', Ct.BMAGENTA], veb=2)
+    bp(['Calling example_progress_bar(symbol="ꟷ", empty="ꟷ", symbol_color='
+        'Ct.GREEN).', Ct.BMAGENTA], veb=2)
     example_progress_bar(symbol="ꟷ", empty="ꟷ", symbol_color=Ct.GREEN)
-    bp(['The next 3 print statements show verbosity levels 1-3 in order',
-        Ct.ORANGE])
+    bp(['Returning from example_progress_bar(symbol="ꟷ", empty="ꟷ", '
+        'symbol_color=Ct.GREEN).', Ct.BMAGENTA], veb=3)
+    bp(['The next 3 print statements show verbosity levels 1-3 in order. Will'
+        ' only be visible if that verbosity level requested', Ct.ORANGE])
     bp(['Verbosity level 1', Ct.BMAGENTA], veb=1)
     bp(['Verbosity level 2', Ct.BMAGENTA], veb=2)
     bp(['Verbosity level 3', Ct.BMAGENTA], veb=3)
-    bp(['Calling example_multi_bar() next', Ct.BMAGENTA], veb=2)
+    bp(['Calling example_multi_bar(4).', Ct.BMAGENTA], veb=2)
     example_multi_bar(4)
-    bp(['Calling example_progress_bar() next', Ct.BMAGENTA], veb=2)
+    bp(['Returning from example_multi_bar(4).', Ct.BMAGENTA], veb=3)
+    bp(['Calling example_progress_bar(symbol="═", empty="═", symbol_color'
+        '=Ct.BROWN, prog_width=66) next', Ct.BMAGENTA], veb=2)
     example_progress_bar(symbol="═", empty="═", symbol_color=Ct.BROWN,
                          prog_width=66)
+    bp(['Returning from  example_progress_bar(symbol="═", empty="═", '
+        'symbol_color=Ct.BROWN, prog_width=66) next', Ct.BMAGENTA], veb=3)
     bp(['The next line is an empty line', Ct.A])
     bp(['', Ct.A])
-    bp(['This shows numbers with no color: 19 00 ', Ct.A, 'and this with text'
-        'and numbers in green: 19 00 -67-', Ct.GREEN], num=0)
-    bp(['Calling example_progress_bar() next with all defaults', Ct.BMAGENTA],
-       veb=2)
+    bp(['This shows numbers with default color: 19 00 ', Ct.A, 'and this with'
+        ' text and numbers in green: 19 00 -67-', Ct.GREEN], num=0)
+    bp(['Calling example_progress_bar().', Ct.BMAGENTA], veb=2)
     example_progress_bar()
-    bp(['The next 2 lines demonstrates error handling with the text within '
-       'the "" the only part typed. The rest is added by "bp".', Ct.A])
-    bp(['"This is error #423" with verbosity set to 1. This should show even'
-        f' without verbosity at runtime (args.verbose={args.verbose})because '
-        'erl overwrite veb', Ct.RED], veb=1, erl=2)
-    bp(['This is error #4244 with no number color', Ct.RED], num=0, erl=2)
-    bp(['This is error 55, with default color', Ct.A], erl=2)
-    bp(['Calling example_progress_bar() next', Ct.BMAGENTA], veb=2)
+    bp(['Returning from example_progress_bar().', Ct.BMAGENTA], veb=3)
+    bp(['The next 3 lines demonstrates error handling with the text within '
+       'the "" the only part typed. The rest is added by "bp" using "erl=2".',
+        Ct.A])
+    bp(['"This is error #423 with verbosity set to 1. This should show even'
+        f' without verbosity at runtime (args.verbose={args.verbose}) because '
+        'erl overwrites veb', Ct.RED], veb=1, erl=2)
+    bp(['"This is error #4244 with no number color"', Ct.RED], num=0, erl=2)
+    bp(['"This is error 55, with default color"', Ct.A], erl=2)
+    bp(['Calling example_progress_bar(symbol="∞", empty="∞", symbol_color='
+        'Ct.BLACK, prog_width=47) next', Ct.BMAGENTA], veb=2)
     example_progress_bar(symbol="∞", empty="∞", symbol_color=Ct.BLACK,
                          prog_width=47)
-    bp(['This is Warning #17171 in yellow.', Ct.YELLOW], erl=1)
+    bp(['Returning from example_progress_bar(symbol="∞", empty="∞", '
+        'symbol_color=Ct.BLACK, prog_width=47) next', Ct.BMAGENTA], veb=3)
+    bp(['This is Warning #17171 in yellow using "erl=1".', Ct.YELLOW], erl=1)
     bp(['This is warning #15 with no number color', Ct.YELLOW], num=0, erl=1)
-    bp(['Calling example_percent_complete().', Ct.BMAGENTA], veb=2)
+    bp(['Calling example_percent_complete(loops=100).', Ct.BMAGENTA], veb=2)
     example_percent_complete(loops=100)
+    bp(['Returning from example_percent_complete(loops=100).', Ct.BMAGENTA],
+       veb=3)
     bp(['This next step will fail. It is commented out. Uncomment individually'
-        'view the failures.', Ct.BMAGENTA], veb=1)
+        ' to view the failures.', Ct.BMAGENTA], veb=1)
     # bp(['Raise exception with only 3 entries.', Ct.Z, 'This causes error'])
     # bp([example_percent_complete, Ct.BMAGENTA])
-    bp(['Final "examples" print in Yellow.', Ct.YELLOW])
+    bp(['Finished with "examples", in Yellow.', Ct.YELLOW], veb=2)
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def main():
 
+    bp(['Entered main().', Ct.BMAGENTA], veb=3)
+    bp(['Print args in 2 different forms:', Ct.BMAGENTA], veb=1)
+    bp([f'Args from argparse in dict form using vars(args): {vars(args)}',
+        Ct.A])
+    bp(['CLI Args split: ', Ct.A], inl=1)
+    for k, v in vars(args).items():
+        bp([f'  {k}: {v}  |', Ct.A], inl=1, log=0)
+    bp(['', Ct.A], log=0)
     bp(['Calling examples().', Ct.BMAGENTA], veb=2)
     examples()
-    bp(['Returning from examples().', Ct.BMAGENTA], veb=2)
+    bp(['Returning from examples().', Ct.BMAGENTA], veb=3)
+    bp(['End of main().', Ct.BMAGENTA], veb=1)
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if __name__ == '__main__':
 
+    bp([f'{ver}\n', Ct.BBLUE])
+    bp(['Print before args showing args bypass. Since no args verbosity '
+        'specified, the veb=2 applies so "INFO-L2" is pre-pended. This will '
+        'not go to any file output since no file output request has yet been '
+        'processed.', Ct.BMAGENTA], veb=2)
     args = get_args()
-    bp(['Retrieved args; calling validate_args().', Ct.BMAGENTA], veb=2)
+    bp(['Retrieved args from get_args().', Ct.BMAGENTA], veb=3)
+    bp(['Calling validate_args():', Ct.BMAGENTA], veb=2)
     validate_args()
-    bp(['Calling main().', Ct.BMAGENTA], veb=2)
+    bp(['Returned from validate_args().', Ct.BMAGENTA], veb=3)
+    bp(['Calling main():', Ct.BMAGENTA], veb=2)
     main()
