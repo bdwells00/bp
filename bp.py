@@ -14,7 +14,7 @@ __license__ = 'MIT'
 __origin_date__ = '2021-11-25'
 __prog__ = 'bp.py'
 __purpose__ = 'colorization module "Better Print" (bp)'
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 __version_date__ = '2021-11-29'
 __version_info__ = tuple(int(i) for i in __version__.split('.') if i.isdigit())
 ver = f'{__prog__} v{__version__} ({__version_date__})'
@@ -202,7 +202,7 @@ def bp(txt: list, erl=0, fil=1, fls=0, inl=0, log=1, num=1, veb=0):
                         f'": must be in pairs (txt length = {txt_l}){Ct.A}')
 
     # ~~~ #     veb section - prepend INFO-L(x) to each output with verbose
-    if veb > 0 and erl == 0:
+    if veb > 0 and erl == 0 and log == 0:
         txt_out = f'INFO-L{veb}: '
         file_out = f'INFO-L{veb}: '
 
