@@ -4,7 +4,7 @@ __license__ = 'MIT'
 __origin_date__ = '2021-11-25'
 __prog__ = 'bp.py'
 __purpose__ = 'colorization module "Better Print" (bp)'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 __version_date__ = '2021-12-02'
 __version_info__ = tuple(int(i) for i in __version__.split('.') if i.isdigit())
 

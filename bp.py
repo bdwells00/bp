@@ -90,14 +90,14 @@ def bp(txt: list, erl=0, fil=1, fls=0, inl=0, log=1, num=1, veb=0):
     txt_out, file_out = '', ''
     # if bp added to script, use script vars, else use ga module vars
     if __name__ == '__main__':
-        args = args                     # noqa
-        global print_tracker            # noqa
+        global args
+        global print_tracker
     else:
         args = ga.args
         print_tracker = ga.print_tracker
     # this provides an empty dict of args in case no args
-    # args_dict = vars(ga.args) if 'args' in globals() else {}
-    args_dict = vars(args)
+    args_dict = vars(ga.args) if 'args' in globals() else {}
+
     # print(args_dict)
     # ~~~ #     validate verbosity
     # if verbose not implemented, print everything
@@ -249,13 +249,14 @@ def main():
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if __name__ == '__main__':
 
+    print_tracker = ga.print_tracker
     bp([f'{ga.ver}\n', Ct.BBLUE])
     bp(['Print before args showing args bypass. Since no args verbosity '
         'specified. This will not go to any file output since no file output '
         'request has yet been processed.', Ct.BMAGENTA], veb=2)
+    args = ga.args
     bp(['Retrieved args from get_args().', Ct.BMAGENTA], veb=3)
     bp(['Calling validate_args():', Ct.BMAGENTA], veb=2)
-    args = ga.args
     validate_args()
     bp(['Returned from validate_args().', Ct.BMAGENTA], veb=3)
     bp(['Calling main():', Ct.BMAGENTA], veb=2)
