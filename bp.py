@@ -4,7 +4,7 @@
 from datetime import datetime
 import os
 import sys
-import global_args as ga
+import options
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -40,7 +40,7 @@ class Ct:
     GREY9 = '\u001b[38;5;239m'              # grey level 239
     GREY10 = '\u001b[38;5;237m'             # grey level 237
     GREY11 = '\u001b[38;5;235m'             # grey level 235
-    GREY12 = '\u001b[38;5;233m'             # grey level 233
+    GREY12 = '\u001b[38;5;233m'             # grey level 233 (most black)
     # ~~~ #     some 24-bit unicode colors
     ORANGE = '\u001b[38;2;233;133;33m'      # orange
     BROWN = '\u001b[38;2;118;65;12m'        # brown
@@ -93,10 +93,10 @@ def bp(txt: list, erl=0, fil=1, fls=0, inl=0, log=1, num=1, veb=0):
         global args
         global print_tracker
     else:
-        args = ga.args
-        print_tracker = ga.print_tracker
+        args = options.args
+        print_tracker = options.print_tracker
     # this provides an empty dict of args in case no args
-    args_dict = vars(ga.args) if 'args' in globals() else {}
+    args_dict = vars(options.args) if 'args' in globals() else {}
 
     # print(args_dict)
     # ~~~ #     validate verbosity
@@ -219,15 +219,15 @@ def validate_args():
                 file_check(f_to_c)
     bp(['Checking if log_file exists and ask if it should be appended.',
         Ct.BMAGENTA], fil=0, veb=2)
-    if ga.args.log_file:
-        file_check(ga.args.log_file)
+    if options.args.log_file:
+        file_check(options.args.log_file)
     bp(['Checking error_log_file exists and ask if it should be appended.',
         Ct.BMAGENTA], fil=0, veb=2)
-    if ga.args.error_log_file:
-        file_check(ga.args.error_log_file)
-    if ga.args.verbose > 3:
-        bp([f'Verbosity level {ga.args.verbose} requested. Using the maximum'
-            ' of 3.', Ct.YELLOW], erl=1)
+    if options.args.error_log_file:
+        file_check(options.args.error_log_file)
+    if options.args.verbose > 3:
+        bp([f'Verbosity level {options.args.verbose} requested. Using the'
+            ' maximum of 3.', Ct.YELLOW], erl=1)
 
     return
 
@@ -237,10 +237,10 @@ def main():
 
     bp(['Entered main().', Ct.BMAGENTA], veb=3)
     bp(['Print args in 2 different forms:', Ct.BMAGENTA], veb=1)
-    bp([f'Args from argparse in dict form using vars(args): {vars(ga.args)}',
-        Ct.A])
+    bp(['Args from argparse in dict form using vars(args): ',
+        f'{vars(options.args)}', Ct.A])
     bp(['CLI Args split: ', Ct.A], inl=1)
-    for k, v in vars(ga.args).items():
+    for k, v in vars(options.args).items():
         bp([f'  {k}: {v}  |', Ct.A], inl=1, log=0)
     bp(['', Ct.A], log=0)
     bp(['End of main().', Ct.BMAGENTA], veb=1)
@@ -249,12 +249,12 @@ def main():
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if __name__ == '__main__':
 
-    print_tracker = ga.print_tracker
-    bp([f'{ga.ver}\n', Ct.BBLUE])
+    print_tracker = options.print_tracker
+    bp([f'{options.ver}\n', Ct.BBLUE])
     bp(['Print before args showing args bypass. Since no args verbosity '
         'specified. This will not go to any file output since no file output '
         'request has yet been processed.', Ct.BMAGENTA], veb=2)
-    args = ga.args
+    args = options.args
     bp(['Retrieved args from get_args().', Ct.BMAGENTA], veb=3)
     bp(['Calling validate_args():', Ct.BMAGENTA], veb=2)
     validate_args()

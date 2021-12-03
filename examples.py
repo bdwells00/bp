@@ -1,7 +1,7 @@
 import random
 import time
 from bp import Ct, bp
-import global_args as ga
+import options
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -130,7 +130,7 @@ def examples():
        'the "" the only part typed. The rest is added by "bp" using "erl=2".',
         Ct.A])
     bp(['"This is error #423 with verbosity set to 1. This should show even'
-        f' without verbosity at runtime (args.verbose={ga.args.verbose}) '
+        f' without verbosity at runtime (args.verbose={options.args.verbose}) '
         'because erl overwrites veb', Ct.RED], veb=1, erl=2)
     bp(['"This is error #4244 with no number color"', Ct.RED], num=0, erl=2)
     bp(['"This is error 55, with default color"', Ct.A], erl=2)
