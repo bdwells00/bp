@@ -1,15 +1,7 @@
 
-__author__ = 'Brandon Wells <wellsb.prog@gmail.com>'
-__license__ = 'MIT'
-__origin_date__ = '2021-11-25'
-__prog__ = 'bp.py'
-__purpose__ = 'colorization module "Better Print" (bp)'
-__version__ = '0.2.2'
-__version_date__ = '2021-12-02'
-__version_info__ = tuple(int(i) for i in __version__.split('.') if i.isdigit())
-
-
 import argparse
+from betterprint.colortext import Ct
+import betterprint.version as ver
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -21,12 +13,12 @@ def get_args():
     """
     # Use argparse to capture cli parameters
     parser = argparse.ArgumentParser(
-        prog=__prog__,
-        description=f'{ver}: {__purpose__}',
+        prog=ver.__prog__,
+        description=f'{Ct.BBLUE}{ver.ver}: {ver.__purpose__}{Ct.A}',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         epilog='This program has no warranty. Please use with caution.',
         add_help=True)
-    parser.add_argument('--log',
+    parser.add_argument('--date-log',
                         help='add timestamp logging to output',
                         action='store_true')
     parser.add_argument('--log-file',
@@ -40,6 +32,10 @@ def get_args():
     parser.add_argument('--no-color',
                         help='don\'t colorize output',
                         action='store_true')
+    parser.add_argument('--quiet',
+                        help='quiet mode surpresses most output including '
+                             'errors but keeps final summary',
+                        action='store_true')
     parser.add_argument('-v',
                         '--verbose',
                         help='3 lvl incremental verbosity (-v, -vv, or -vvv)',
@@ -48,11 +44,6 @@ def get_args():
     parser.add_argument('--version',
                         help='print program version and exit',
                         action='version',
-                        version=f'{ver}')
+                        version=f'{Ct.BBLUE}{ver.ver}{Ct.A}')
 
     return parser.parse_args()
-
-
-print_tracker = 0
-ver = f'{__prog__} v{__version__} ({__version_date__})'
-args = get_args()

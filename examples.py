@@ -1,7 +1,11 @@
+
 import random
 import time
-from bp import Ct, bp
-import options
+from betterprint.betterprint import bp, bp_dict
+from betterprint.colortext import Ct
+from modules.argsval import validate_args
+import modules.options as options
+import modules.version as version
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -92,10 +96,23 @@ def example_percent_complete(loops=50, loop_color=Ct.BLACK, txt='Progress...'):
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def examples():
+def main():
+
+    # ~~~ #             -variables-
+    bp_dict['color'] = 0 if args.no_color else 1
+    bp_dict['date_log'] = 1 if args.date_log else 0
+    bp_dict['log_file'] = args.log_file
+    bp_dict['error_log_file'] = args.error_log_file
+    bp_dict['quiet'] = 1 if args.quiet else 0
+    bp_dict['verbose'] = args.verbose
+
+    # ~~~ #             -examples-
+    bp(['"This is error #420 with verbosity set to 1. This should show even'
+        f' without verbosity at runtime (args.verbose={options.args.verbose}) '
+        'because err overwrites veb', Ct.RED], veb=1, err=2)
     """Call various examples using bp to show capabilities and ways to make it
     work for you."""
-    bp(['Entering examples().', Ct.BMAGENTA], veb=3)
+    bp(['Entering main().', Ct.BMAGENTA], veb=3)
     bp(['This text shows list position 0 with position 1 of default color,',
         Ct.A, ' and this text shows list position 2 with position 3 of Red.'
         ' This uses default settings.',
@@ -127,21 +144,21 @@ def examples():
     example_progress_bar()
     bp(['Returning from example_progress_bar().', Ct.BMAGENTA], veb=3)
     bp(['The next 3 lines demonstrates error handling with the text within '
-       'the "" the only part typed. The rest is added by "bp" using "erl=2".',
+       'the "" the only part typed. The rest is added by "bp" using "err=2".',
         Ct.A])
     bp(['"This is error #423 with verbosity set to 1. This should show even'
         f' without verbosity at runtime (args.verbose={options.args.verbose}) '
-        'because erl overwrites veb', Ct.RED], veb=1, erl=2)
-    bp(['"This is error #4244 with no number color"', Ct.RED], num=0, erl=2)
-    bp(['"This is error 55, with default color"', Ct.A], erl=2)
+        'because err overwrites veb', Ct.RED], veb=1, err=2)
+    bp(['"This is error #4244 with no number color"', Ct.RED], num=0, err=2)
+    bp(['"This is error 55, with default color"', Ct.A], err=2)
     bp(['Calling example_progress_bar(symbol="∞", empty="∞", symbol_color='
         'Ct.BLACK, prog_width=47) next', Ct.BMAGENTA], veb=2)
     example_progress_bar(symbol="∞", empty="∞", symbol_color=Ct.BLACK,
                          prog_width=47)
     bp(['Returning from example_progress_bar(symbol="∞", empty="∞", '
         'symbol_color=Ct.BLACK, prog_width=47) next', Ct.BMAGENTA], veb=3)
-    bp(['This is Warning #17171 in yellow using "erl=1".', Ct.YELLOW], erl=1)
-    bp(['This is warning #15 with no number color', Ct.YELLOW], num=0, erl=1)
+    bp(['This is Warning #17171 in yellow using "err=1".', Ct.YELLOW], err=1)
+    bp(['This is warning #15 with no number color', Ct.YELLOW], num=0, err=1)
     bp(['Calling example_percent_complete(loops=100).', Ct.BMAGENTA], veb=2)
     example_percent_complete(loops=100)
     bp(['Returning from example_percent_complete(loops=100).', Ct.BMAGENTA],
@@ -150,9 +167,17 @@ def examples():
         ' to view the failures.', Ct.BMAGENTA], veb=1)
     # bp(['Raise exception with only 3 entries.', Ct.Z, 'This causes error'])
     # bp([example_percent_complete, Ct.BMAGENTA])
-    bp(['Finished with "examples", in Yellow.', Ct.YELLOW], veb=2)
+    bp(['Finished with "main()", in Yellow.', Ct.YELLOW], veb=2)
 
 
 if __name__ == '__main__':
 
-    examples()
+    # ~~~ #         -title- section
+    bp([f'{version.ver} - {version.__purpose__}\n', Ct.BBLUE])
+
+    # ~~~ #             -args-
+    args = options.args
+    validate_args()
+
+    # ~~~ #             -main-
+    main()
