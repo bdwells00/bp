@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 
 import random
 import time
@@ -98,14 +100,6 @@ def example_percent_complete(loops=50, loop_color=Ct.BLACK, txt='Progress...'):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def main():
 
-    # ~~~ #             -variables-
-    bp_dict['color'] = 0 if args.no_color else 1
-    bp_dict['date_log'] = 1 if args.date_log else 0
-    bp_dict['log_file'] = args.log_file
-    bp_dict['error_log_file'] = args.error_log_file
-    bp_dict['quiet'] = 1 if args.quiet else 0
-    bp_dict['verbose'] = args.verbose
-
     # ~~~ #             -examples-
     bp(['"This is error #420 with verbosity set to 1. This should show even'
         f' without verbosity at runtime (args.verbose={options.args.verbose}) '
@@ -172,12 +166,21 @@ def main():
 
 if __name__ == '__main__':
 
-    # ~~~ #         -title- section
-    bp([f'{version.ver} - {version.__purpose__}\n', Ct.BBLUE])
-
     # ~~~ #             -args-
     args = options.args
+
+    # ~~~ #             -title-
+    bp([f'{version.ver} - {version.__purpose__}\n', Ct.BBLUE])
+
+    # ~~~ #             -validation-
     validate_args()
 
-    # ~~~ #             -main-
+    # ~~~ #             -variables-
+    bp_dict['color'] = 0 if args.no_color else 1
+    bp_dict['date_log'] = 1 if args.date_log else 0
+    bp_dict['log_file'] = args.log_file
+    bp_dict['error_log_file'] = args.error_log_file
+    bp_dict['quiet'] = 1 if args.quiet else 0
+    bp_dict['verbose'] = args.verbose
+
     main()
