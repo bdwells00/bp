@@ -1,7 +1,32 @@
 
 import argparse
+from pathlib import Path
+import sys
+from betterprint.betterprint import bp
 from betterprint.colortext import Ct
 import betterprint.version as ver
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+def file_check(f_to_c):
+    """Check log file or error log file if it exists and if it should be
+    appended.
+
+    Args:
+        - f_to_c (string): the file to check
+    """
+    file_to_check = Path(f_to_c)
+    if file_to_check.is_file():
+        check_append = input(f'{Ct.yellow}({f_to_c}) exists. Append? [Y/N]: {Ct.a}')
+        # abort on no
+        if check_append.lower() == 'n':
+            bp(['Exiting', Ct.yellow], fil=0, err=1)
+            sys.exit(1)
+        # call file_check again if anything other than y (since n checked)
+        elif check_append.lower() != 'y':
+            bp([f'{check_append} is not "Y" or "N".', Ct.yellow], err=1, fil=0)
+            file_check(f_to_c)
+    return
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -14,7 +39,7 @@ def get_args():
     # Use argparse to capture cli parameters
     parser = argparse.ArgumentParser(
         prog=ver.__prog__,
-        description=f'{Ct.BBLUE}{ver.ver}: {ver.__purpose__}{Ct.A}',
+        description=f'{Ct.bblue}{ver.ver}: {ver.__purpose__}{Ct.a}',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         epilog='This program has no warranty. Please use with caution.',
         add_help=True)
@@ -44,6 +69,20 @@ def get_args():
     parser.add_argument('--version',
                         help='print program version and exit',
                         action='version',
-                        version=f'{Ct.BBLUE}{ver.ver}{Ct.A}')
+                        version=f'{Ct.bblue}{ver.ver}{Ct.a}')
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    bp(['Checking if log_file exists and ask if it should be appended.',
+        Ct.bmagenta], fil=0, veb=2)
+    if args.log_file:
+        file_check(args.log_file)
+    bp(['Checking error_log_file exists and ask if it should be appended.',
+        Ct.bmagenta], fil=0, veb=2)
+    if args.error_log_file:
+        file_check(args.error_log_file)
+    if args.verbose > 3:
+        bp([f'Verbosity level {args.verbose} requested. Using the maximum of 3.',
+            Ct.yellow], err=1)
+
+    return args
